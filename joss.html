@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rocket Racing Game</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: #0a0a0f;
+    color: white;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Winner Bar */
+  .winner-bar {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 12px;
+    background: linear-gradient(90deg, #ffd700, #ffaa00, #ffd700);
+    animation: winnerBarSlide 0.5s ease;
+  }
+  .winner-bar.show { display: flex; }
+  @keyframes winnerBarSlide {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .winner-bar .trophy {
+    font-size: 28px;
+    animation: trophyBounce 1s ease infinite;
+  }
+  @keyframes trophyBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .winner-bar .winner-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .winner-bar .winner-flag {
+    width: 40px; height: 28px;
+    object-fit: cover;
+    border-radius: 3px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    animation: flagWave 2s ease-in-out infinite;
+  }
+  @keyframes flagWave {
+    0%, 100% { transform: rotate(-2deg) scale(1); }
+    50% { transform: rotate(2deg) scale(1.05); }
+  }
+  .winner-bar .winner-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #000;
+  }
+  .winner-bar .winner-score {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    background: rgba(255,255,255,0.3);
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+
+  /* Scoreboard */
+  .scoreboard {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 4px;
+    background: linear-gradient(90deg, #ff3366, #ff6b35, #ff3366);
+  }
+  .score-item {
+    display: flex; align-items: center; gap: 4px;
+    background: rgba(0,0,0,0.3);
+    padding: 5px 10px;
+    border-radius: 16px;
+    font-size: 12px; font-weight: 600;
+  }
+  .flag-img {
+    width: 24px; height: 18px;
+    object-fit: cover;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+
+  /* Racing Track */
+  .track-container {
+    flex: 1;
+    position: relative;
+    background: linear-gradient(180deg, #0a0a15 0%, #1a0a2e 50%, #0a0a15 100%);
+    overflow: hidden;
+  }
+
+  .moving-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(2px 2px at 20px 30px, white, transparent),
+      radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+      radial-gradient(1px 1px at 90px 40px, white, transparent),
+      radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.6), transparent),
+      radial-gradient(1px 1px at 230px 80px, white, transparent),
+      radial-gradient(2px 2px at 300px 150px, rgba(255,255,255,0.7), transparent),
+      repeating-linear-gradient(
+        90deg,
+        transparent 0px, transparent 80px,
+        rgba(255,255,255,0.05) 80px, rgba(255,255,255,0.05) 82px
+      );
+    background-size: 350px 200px, 350px 200px, 350px 200px, 350px 200px, 350px 200px, 350px 200px, 200px 100%;
+    animation: bgMove 2s linear infinite;
+  }
+
+  @keyframes bgMove {
+    from { background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0; }
+    to { background-position: -350px 0, -350px 0, -350px 0, -350px 0, -350px 0, -350px 0, -200px 0; }
+  }
+
+  .ground-texture {
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+    height: 30%;
+    background: repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 2px,
+      transparent 2px, transparent 60px
+    );
+    animation: groundMove 1.5s linear infinite;
+  }
+
+  @keyframes groundMove {
+    from { background-position: 0 0; }
+    to { background-position: -60px 0; }
+  }
+
+  .track {
+    position: relative;
+    height: 100%;
+    padding: 8px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    z-index: 2;
+  }
+
+  .lane {
+    position: relative;
+    height: 42px;
+    display: flex;
+    align-items: center;
+  }
+
+  .left-flag {
+    width: 32px;
+    height: 22px;
+    object-fit: cover;
+    border-radius: 3px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    margin-right: 6px;
+    flex-shrink: 0;
+  }
+
+  .lane-number {
+    width: 20px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #666;
+  }
+
+  .lane-track {
+    flex: 1;
+    height: 2px;
+    background: repeating-linear-gradient(
+      90deg,
+      #333 0px, #333 20px,
+      transparent 20px, transparent 40px
+    );
+    position: relative;
+    margin: 0 8px;
+  }
+
+  .finish-line {
+    position: absolute;
+    right: 40px;
+    top: -18px;
+    bottom: -18px;
+    width: 3px;
+    background: repeating-linear-gradient(
+      0deg,
+      #fff 0px, #fff 6px,
+      #000 6px, #000 12px
+    );
+    border-radius: 2px;
+  }
+
+  .rocket {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+    transition: left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    filter: drop-shadow(0 0 10px currentColor);
+    z-index: 5;
+    animation: rocketFloat 1.5s ease-in-out infinite;
+  }
+
+  @keyframes rocketFloat {
+    0%, 100% { transform: translateY(-50%) translateX(0) rotate(0deg); }
+    25% { transform: translateY(-60%) translateX(2px) rotate(1deg); }
+    50% { transform: translateY(-50%) translateX(4px) rotate(0deg); }
+    75% { transform: translateY(-60%) translateX(2px) rotate(-1deg); }
+  }
+
+  .rocket.burst {
+    animation: rocketBurst 0.4s ease-out !important;
+  }
+
+  @keyframes rocketBurst {
+    0% { transform: translateY(-50%) scale(1); }
+    50% { transform: translateY(-65%) scale(1.2) translateX(8px); }
+    100% { transform: translateY(-50%) scale(1); }
+  }
+
+  .rocket-trail {
+    position: absolute;
+    left: -25px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 25px;
+    height: 3px;
+    background: linear-gradient(90deg, currentColor, transparent);
+    border-radius: 2px;
+    opacity: 0.6;
+    animation: trailFlicker 0.3s ease-in-out infinite alternate;
+  }
+
+  @keyframes trailFlicker {
+    from { opacity: 0.4; width: 18px; }
+    to { opacity: 0.8; width: 30px; }
+  }
+
+  .country-label {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.08);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    pointer-events: none;
+  }
+
+  .lane-flag {
+    width: 28px;
+    height: 20px;
+    object-fit: cover;
+    border-radius: 3px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+
+  .speed-lines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .speed-line {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: speedLineMove linear infinite;
+  }
+
+  @keyframes speedLineMove {
+    from { transform: translateX(100vw); }
+    to { transform: translateX(-100px); }
+  }
+
+  .gift-panel {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 50;
+  }
+
+  .gift-btn-action {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .gift-btn-action:hover { transform: scale(1.15); }
+  .gift-btn-action:active { transform: scale(0.95); }
+
+  .gift-btn-action .cost {
+    position: absolute;
+    bottom: -12px;
+    font-size: 8px;
+    background: #333;
+    padding: 1px 5px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  .confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    animation: confettiFall 3s linear forwards;
+    z-index: 999;
+  }
+
+  @keyframes confettiFall {
+    to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  .rank-badge {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: gold;
+    color: #000;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 900;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .rank-badge.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="winner-bar" id="winnerBar">
+  <div class="trophy">🏆</div>
+  <div class="winner-info" id="winnerInfo"></div>
+</div>
+
+<div class="scoreboard" id="scoreboard"></div>
+
+<div class="track-container">
+  <div class="moving-bg"></div>
+  <div class="ground-texture"></div>
+  <div class="speed-lines" id="speedLines"></div>
+
+  <div class="track" id="track"></div>
+
+  <div class="gift-panel">
+    <button class="gift-btn-action" style="border-color:#ff3366;color:#ff3366" onclick="sendGift(0)">❤️</button>
+    <button class="gift-btn-action" style="border-color:#ff9500;color:#ff9500" onclick="sendGift(1)">🌹</button>
+    <button class="gift-btn-action" style="border-color:#00d4ff;color:#00d4ff" onclick="sendGift(2)">🎁</button>
+    <button class="gift-btn-action" style="border-color:#ff00ff;color:#ff00ff" onclick="sendGift(3)">👑</button>
+    <button class="gift-btn-action" style="border-color:#00ff88;color:#00ff88" onclick="sendGift(4)">💎</button>
+  </div>
+</div>
+
+<script>
+const flagImages = {
+  'Indonesia': 'https://image.similarpng.com/327ea33b634d70838083cb60b3943709f1886fa8.png',
+  'Vietnam': 'https://image.similarpng.com/9f1cc31309987e7057c8e6fb2352e2a44a5ff8c0.png',
+  'Thailand': 'https://image.similarpng.com/f52fe9be884b998d1bae1ef0d6025dc621c8d9d1.png',
+  'Singapore': 'https://image.similarpng.com/cafcdd68857f2ebf5bef888b0ff94163eaa7319f.png',
+  'Malaysia': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Flag_of_Malaysia.svg/2560px-Flag_of_Malaysia.svg.png'
+};
+
+const countries = [
+  { name: 'Indonesia', flagImg: flagImages['Indonesia'], color: '#ff3333', emoji: '🚀', score: 0, wins: 0 },
+  { name: 'Vietnam', flagImg: flagImages['Vietnam'], color: '#ff0000', emoji: '🚀', score: 0, wins: 0 },
+  { name: 'Thailand', flagImg: flagImages['Thailand'], color: '#0066cc', emoji: '🚀', score: 0, wins: 0 },
+  { name: 'Singapore', flagImg: flagImages['Singapore'], color: '#ff0000', emoji: '🚀', score: 0, wins: 0 },
+  { name: 'Malaysia', flagImg: flagImages['Malaysia'], color: '#ffcc00', emoji: '🚀', score: 0, wins: 0 }
+];
+
+let raceFinished = false;
+let horsePositions = new Array(countries.length).fill(0);
+const FINISH_LINE = 20; // 20 points to win
+const POINTS_PER_GIFT = 1; // All gifts = 1 point
+
+function init() {
+  renderScoreboard();
+  renderTrack();
+  createSpeedLines();
+}
+
+function createSpeedLines() {
+  const container = document.getElementById('speedLines');
+  for (let i = 0; i < 15; i++) {
+    const line = document.createElement('div');
+    line.className = 'speed-line';
+    line.style.top = Math.random() * 100 + '%';
+    line.style.width = (50 + Math.random() * 150) + 'px';
+    line.style.left = Math.random() * 100 + 'vw';
+    line.style.animationDuration = (0.5 + Math.random() * 1.5) + 's';
+    line.style.animationDelay = Math.random() * 2 + 's';
+    container.appendChild(line);
+  }
+}
+
+function renderScoreboard() {
+  const sb = document.getElementById('scoreboard');
+  const sorted = [...countries].sort((a,b) => b.score - a.score);
+  sb.innerHTML = sorted.map((c, i) => `
+    <div class="score-item">
+      <img class="flag-img" src="${c.flagImg}" alt="${c.name}" onerror="this.style.display='none'">
+      <span>${c.score}</span>
+      ${c.wins > 0 ? `<span style="color:#ffd700;font-size:10px">🏆${c.wins}</span>` : ''}
+    </div>
+  `).join('');
+}
+
+function renderTrack() {
+  const track = document.getElementById('track');
+  track.innerHTML = countries.map((c, i) => `
+    <div class="lane">
+      <img class="left-flag" src="${c.flagImg}" alt="${c.name}" onerror="this.style.display='none'">
+      <div class="lane-number">${i+1}</div>
+      <div class="lane-track">
+        <span class="country-label">${c.name}</span>
+        <div class="finish-line"></div>
+        <div class="rocket" id="rocket-${i}" style="color:${c.color}">
+          ${c.emoji}
+          <div class="rocket-trail" style="color:${c.color}"></div>
+        </div>
+        <div class="rank-badge" id="rank-${i}"></div>
+      </div>
+      <img class="lane-flag" src="${c.flagImg}" alt="${c.name}" onerror="this.style.display='none'">
+    </div>
+  `).join('');
+}
+
+function moveRocket(index) {
+  if (raceFinished) return;
+
+  horsePositions[index] = Math.min(horsePositions[index] + POINTS_PER_GIFT, FINISH_LINE);
+  const rocket = document.getElementById(`rocket-${index}`);
+  // Calculate percentage: position / finish_line * max_visible_percent
+  const maxVisiblePercent = 85;
+  const leftPercent = (horsePositions[index] / FINISH_LINE) * maxVisiblePercent;
+  rocket.style.left = leftPercent + '%';
+
+  rocket.classList.add('burst');
+  setTimeout(() => rocket.classList.remove('burst'), 400);
+
+  countries[index].score = horsePositions[index];
+  renderScoreboard();
+  updateRanks();
+
+  if (horsePositions[index] >= FINISH_LINE) {
+    finishRace(index);
+  }
+}
+
+function updateRanks() {
+  const sorted = horsePositions.map((pos, i) => ({ pos, i }))
+    .sort((a, b) => b.pos - a.pos);
+
+  sorted.forEach((item, rank) => {
+    const badge = document.getElementById(`rank-${item.i}`);
+    if (rank < 3) {
+      badge.textContent = rank + 1;
+      badge.style.background = rank === 0 ? 'gold' : rank === 1 ? '#c0c0c0' : '#cd7f32';
+      badge.classList.add('show');
+    }
+  });
+}
+
+function sendGift(countryIndex) {
+  moveRocket(countryIndex);
+}
+
+function finishRace(winnerIndex) {
+  raceFinished = true;
+  const winner = countries[winnerIndex];
+  winner.wins += 1;
+
+  const winnerBar = document.getElementById('winnerBar');
+  const winnerInfo = document.getElementById('winnerInfo');
+  winnerInfo.innerHTML = `
+    <img class="winner-flag" src="${winner.flagImg}" alt="${winner.name}">
+    <span class="winner-name">${winner.name} MENANG!</span>
+    <span class="winner-score">🏆 ${winner.wins} kemenangan</span>
+  `;
+  winnerBar.classList.add('show');
+
+  renderScoreboard();
+
+  for (let i = 0; i < 50; i++) {
+    setTimeout(() => createConfetti(), i * 50);
+  }
+
+  setTimeout(() => resetToStart(), 3000);
+}
+
+function createConfetti() {
+  const confetti = document.createElement('div');
+  confetti.className = 'confetti';
+  confetti.style.left = Math.random() * 100 + 'vw';
+  confetti.style.background = ['#ff3366', '#00d4ff', '#ff9500', '#00ff88', '#ff00ff', '#ffff00'][Math.floor(Math.random() * 6)];
+  confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
+  document.body.appendChild(confetti);
+  setTimeout(() => confetti.remove(), 4000);
+}
+
+function resetToStart() {
+  raceFinished = false;
+  horsePositions = new Array(countries.length).fill(0);
+  countries.forEach(c => c.score = 0);
+
+  document.getElementById('winnerBar').classList.remove('show');
+
+  countries.forEach((c, i) => {
+    const rocket = document.getElementById(`rocket-${i}`);
+    rocket.style.left = '0%';
+    document.getElementById(`rank-${i}`).classList.remove('show');
+  });
+
+  renderScoreboard();
+}
+
+init();
+</script>
+
+</body>
+</html>
