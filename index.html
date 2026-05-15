@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rocket Racing - IndoFinity Live</title>
+<title>Rocket Racing - Live</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@400;600;700&display=swap');
 
@@ -26,66 +26,6 @@
     overflow:hidden;
   }
 
-  /* ── SETUP PANEL helo ── */
-  #setup-panel {
-    position:fixed; inset:0;
-    background:rgba(4,4,12,0.97);
-    z-index:1000;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:16px;
-  }
-  .setup-box {
-    background:#0d0d20;
-    border:1px solid #2a2a50;
-    border-radius:16px;
-    padding:32px 36px;
-    width:460px;
-    max-width:100%;
-    max-height:90vh;
-    overflow-y:auto;
-  }
-  .setup-box h2 {
-    font-family:'Orbitron',sans-serif;
-    font-size:18px; color:var(--blue);
-    margin-bottom:6px;
-  }
-  .setup-box p { font-size:13px; color:#777; margin-bottom:20px; line-height:1.6; }
-  .setup-step {
-    background:#111125;
-    border-left:3px solid var(--blue);
-    border-radius:6px;
-    padding:10px 14px;
-    font-size:12px; color:#99b;
-    margin-bottom:18px; line-height:1.9;
-  }
-  .setup-step b { color:var(--yellow); }
-  .setup-step code {
-    background:#1e1e3a; padding:1px 6px;
-    border-radius:4px; color:var(--green); font-size:11px;
-  }
-  .setup-box label { display:block; font-size:12px; color:#aaa; margin-bottom:5px; }
-  .setup-box input, .setup-box select {
-    width:100%; background:#16162a; border:1px solid #333;
-    border-radius:8px; color:white; padding:10px 14px;
-    font-size:14px; font-family:'Poppins',sans-serif;
-    margin-bottom:14px; outline:none; transition:border-color 0.2s;
-  }
-  .setup-box input:focus { border-color:var(--blue); }
-  .row { display:flex; gap:10px; }
-  .row > div { flex:1; }
-  .btn-start {
-    width:100%; padding:13px;
-    background:linear-gradient(135deg, var(--pink), var(--purple));
-    border:none; border-radius:10px; color:white;
-    font-family:'Orbitron',sans-serif; font-size:14px; font-weight:700;
-    cursor:pointer; letter-spacing:1px; margin-top:4px;
-    transition:opacity 0.2s, transform 0.1s;
-  }
-  .btn-start:hover { opacity:0.9; }
-  .btn-start:active { transform:scale(0.98); }
-
   /* ── STATUS BAR ── */
   #status-bar {
     display:flex; align-items:center; gap:8px;
@@ -99,8 +39,6 @@
   .dot.err { background:#ff4444; }
   #stxt { color:#555; flex:1; }
   #lgift { color:var(--yellow); font-size:10px; }
-  .sbtn { background:none; border:1px solid #222; color:#444; border-radius:6px; padding:3px 9px; font-size:10px; cursor:pointer; transition:all 0.2s; }
-  .sbtn:hover { border-color:#444; color:#aaa; }
 
   /* ── WINNER BAR ── */
   #winner-bar {
@@ -250,52 +188,11 @@
 </head>
 <body>
 
-<!-- SETUP -->
-<div id="setup-panel">
-  <div class="setup-box">
-    <h2>ROCKET RACING SETUP</h2>
-    <p>Hubungkan game ke TikTok Live kamu via IndoFinity + ntfy.sh (gratis, tanpa server).</p>
-
-    <div class="setup-step">
-      <b>Cara setup (5 menit):</b><br>
-      1. Buka <b>ntfy.sh</b> — tulis topic unik kamu (misal: <code>rocket-namastreamer123</code>)<br>
-      2. Di IndoFinity &#8594; <b>Pusat Interaksi</b> &#8594; <b>+ Aktivitas</b><br>
-      3. Pilih event gift yang diinginkan, aksi: <b>Trigger Webhook</b><br>
-      4. URL: <code>https://ntfy.sh/TOPICMU?title=gift&amp;message=indonesia</code><br>
-      5. Ganti <code>indonesia</code> dengan nama negara sesuai lane<br>
-      6. Buat 1 aktivitas per negara / per gift berbeda<br>
-      7. Masukkan topic yang sama di kolom bawah lalu klik Mulai
-    </div>
-
-    <label>NTFY Topic</label>
-    <input type="text" id="ntfy-topic" placeholder="contoh: rocket-streamerkamu" />
-
-    <label>Target Poin Menang</label>
-    <input type="number" id="finish-input" value="20" min="5" max="200" />
-
-    <div class="row">
-      <div><label>Lane 1</label><input type="text" id="c0" value="Indonesia" /></div>
-      <div><label>Lane 2</label><input type="text" id="c1" value="Vietnam" /></div>
-    </div>
-    <div class="row">
-      <div><label>Lane 3</label><input type="text" id="c2" value="Thailand" /></div>
-      <div><label>Lane 4</label><input type="text" id="c3" value="Singapore" /></div>
-    </div>
-    <div class="row">
-      <div><label>Lane 5</label><input type="text" id="c4" value="Malaysia" /></div>
-      <div></div>
-    </div>
-
-    <button class="btn-start" onclick="startGame()">MULAI GAME</button>
-  </div>
-</div>
-
 <!-- STATUS BAR -->
 <div id="status-bar">
   <div class="dot" id="dot"></div>
-  <span id="stxt">Belum terhubung</span>
+  <span id="stxt">Menghubungkan...</span>
   <span id="lgift"></span>
-  <button class="sbtn" onclick="showSetup()">&#9881; Settings</button>
 </div>
 
 <!-- WINNER BAR -->
@@ -323,54 +220,66 @@
 <div id="gnotify"><div class="gnu" id="gnu">-</div><div class="gng" id="gng">-</div></div>
 
 <script>
+// ══════════════════════════════════════════════════
+//   ✏️  EDIT KONFIGURASI DI SINI
+// ══════════════════════════════════════════════════
+var CONFIG = {
+  topic:     'dwefhwhuy',   // ← ganti dengan NTFY topic kamu
+  finish:    20,             // ← target poin menang
+  countries: [
+    'Indonesia',
+    'Vietnam',
+    'Thailand',
+    'Singapore',
+    'Malaysia'
+  ]
+};
+// ══════════════════════════════════════════════════
+
 var FLAGS = {
-  indonesia:'&#127470;&#127465;', vietnam:'&#127483;&#127475;', thailand:'&#127481;&#127469;',
-  singapore:'&#127480;&#127468;', malaysia:'&#127474;&#127486;', philippines:'&#127477;&#127469;',
-  myanmar:'&#127474;&#127474;', cambodia:'&#127472;&#127469;', laos:'&#127473;&#127462;', brunei:'&#127463;&#127475;'
+  indonesia:'🇮🇩', vietnam:'🇻🇳', thailand:'🇹🇭',
+  singapore:'🇸🇬', malaysia:'🇲🇾', philippines:'🇵🇭',
+  myanmar:'🇲🇲', cambodia:'🇰🇭', laos:'🇱🇦', brunei:'🇧🇳'
 };
 var COLORS = ['#ff2d78','#ff8c00','#00d4ff','#7b2fff','#00ff88'];
 
-var cfg = { topic:'', finish:20, countries:[] };
+var cfg = { topic: CONFIG.topic, finish: CONFIG.finish, countries: [] };
 var pos = [], finished = false, es = null, ntimer = null;
 
-function startGame() {
-  var t = document.getElementById('ntfy-topic').value.trim();
-  if (!t) { alert('Masukkan NTFY Topic!'); return; }
-  cfg.topic = t;
-  cfg.finish = parseInt(document.getElementById('finish-input').value) || 20;
-  cfg.countries = [];
-  for (var i=0; i<5; i++) {
-    var n = (document.getElementById('c'+i).value || '').trim() || ('Negara'+(i+1));
-    var k = n.toLowerCase();
-    cfg.countries.push({ name:n, flag:FLAGS[k]||'&#127987;&#65039;', color:COLORS[i], score:0, wins:0 });
-  }
-  pos = new Array(cfg.countries.length).fill(0);
-  finished = false;
-  document.getElementById('setup-panel').style.display = 'none';
+// Build countries array from config
+CONFIG.countries.forEach(function(name, i) {
+  var k = name.toLowerCase();
+  cfg.countries.push({
+    name: name,
+    flag: FLAGS[k] || '🏳️',
+    color: COLORS[i % COLORS.length],
+    score: 0,
+    wins: 0
+  });
+});
+pos = new Array(cfg.countries.length).fill(0);
+
+// Auto-start on load
+window.addEventListener('load', function() {
   renderAll();
   connectNtfy();
-}
-
-function showSetup() {
-  if (es) { es.close(); es = null; }
-  document.getElementById('setup-panel').style.display = 'flex';
-}
+});
 
 function connectNtfy() {
   if (es) es.close();
-  setStatus('','Menghubungkan...');
+  setStatus('', 'Menghubungkan ke ntfy.sh...');
   es = new EventSource('https://ntfy.sh/' + cfg.topic + '/sse');
-  es.onopen = function() { setStatus('on','Terhubung ke ntfy.sh'); };
+  es.onopen = function() { setStatus('on', 'Terhubung — ' + cfg.topic); };
   es.onmessage = function(e) {
     try {
       var d = JSON.parse(e.data);
       if (d.event === 'keepalive') return;
-      var msg = ((d.message||d.title||'')).toLowerCase().trim();
-      for (var i=0; i<cfg.countries.length; i++) {
+      var msg = ((d.message || d.title || '')).toLowerCase().trim();
+      for (var i = 0; i < cfg.countries.length; i++) {
         var cn = cfg.countries[i].name.toLowerCase();
         if (msg.indexOf(cn) !== -1 || cn.indexOf(msg) !== -1) {
-          document.getElementById('lgift').textContent = '&#9889; '+(d.title||'Viewer')+' \u2192 '+cfg.countries[i].name;
-          showNotify(d.title||'Viewer', cfg.countries[i].name, cfg.countries[i].flag);
+          document.getElementById('lgift').textContent = '⚡ ' + (d.title || 'Viewer') + ' → ' + cfg.countries[i].name;
+          showNotify(d.title || 'Viewer', cfg.countries[i].name, cfg.countries[i].flag);
           moveRocket(i);
           return;
         }
@@ -378,8 +287,8 @@ function connectNtfy() {
     } catch(x) {}
   };
   es.onerror = function() {
-    setStatus('err','Koneksi terputus, retry...');
-    setTimeout(function(){ if(es) connectNtfy(); }, 4000);
+    setStatus('err', 'Koneksi terputus, mencoba ulang...');
+    setTimeout(function() { if (es) connectNtfy(); }, 4000);
   };
 }
 
@@ -390,23 +299,24 @@ function renderAll() {
 function renderScore() {
   var sb = document.getElementById('scoreboard');
   var s = cfg.countries.slice().sort(function(a,b){return b.score-a.score;});
-  var mx = s[0]?s[0].score:0;
+  var mx = s[0] ? s[0].score : 0;
   sb.innerHTML = s.map(function(c) {
-    var lead = c.score>0&&c.score===mx?' lead':'';
-    return '<div class="si'+lead+'">'+c.flag+' <span>'+c.score+'</span>'+(c.wins>0?'<span style="color:var(--yellow);font-size:9px">&#127942;'+c.wins+'</span>':'')+'</div>';
+    var lead = c.score > 0 && c.score === mx ? ' lead' : '';
+    return '<div class="si' + lead + '">' + c.flag + ' <span>' + c.score + '</span>' +
+      (c.wins > 0 ? '<span style="color:var(--yellow);font-size:9px">🏆' + c.wins + '</span>' : '') + '</div>';
   }).join('');
 }
 
 function renderTrack() {
   var t = document.getElementById('track');
   t.innerHTML = cfg.countries.map(function(c,i) {
-    return '<div class="lane">'+
-      '<div class="lleft"><span class="lflag">'+c.flag+'</span><span class="lname">'+c.name.toUpperCase()+'</span></div>'+
-      '<div class="ltrack">'+
-        '<div class="fline"></div>'+
-        '<div class="rocket" id="r'+i+'" style="color:'+c.color+'">&#128640;<div class="trail" style="color:'+c.color+'"></div></div>'+
-        '<div class="rbadge" id="b'+i+'"></div>'+
-      '</div>'+
+    return '<div class="lane">' +
+      '<div class="lleft"><span class="lflag">' + c.flag + '</span><span class="lname">' + c.name.toUpperCase() + '</span></div>' +
+      '<div class="ltrack">' +
+        '<div class="fline"></div>' +
+        '<div class="rocket" id="r'+i+'" style="color:'+c.color+'">🚀<div class="trail" style="color:'+c.color+'"></div></div>' +
+        '<div class="rbadge" id="b'+i+'"></div>' +
+      '</div>' +
     '</div>';
   }).join('');
 }
