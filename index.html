@@ -1,419 +1,50 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rocket Racing - Live</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@400;600;700&display=swap');
-
-  :root {
-    --pink: #ff2d78;
-    --blue: #00d4ff;
-    --yellow: #ffd700;
-    --green: #00ff88;
-    --purple: #7b2fff;
-    --bg: #04040c;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    font-family:'Poppins',sans-serif;
-    background:var(--bg);
-    color:white;
-    height:100vh;
-    display:flex;
-    flex-direction:column;
-    overflow:hidden;
-  }
-
-  /* ── STATUS BAR ── */
-  #status-bar {
-    display:flex; align-items:center; gap:8px;
-    padding:5px 14px; background:#07071a;
-    border-bottom:1px solid #1a1a30;
-    font-size:11px; font-family:'Orbitron',sans-serif;
-    letter-spacing:0.4px; flex-shrink:0;
-  }
-  .dot { width:7px; height:7px; border-radius:50%; background:#333; flex-shrink:0; transition:background 0.3s; }
-  .dot.on { background:var(--green); box-shadow:0 0 7px var(--green); }
-  .dot.err { background:#ff4444; }
-  #stxt { color:#555; flex:1; }
-  #lgift { color:var(--yellow); font-size:10px; }
-
-  /* ── WINNER BAR ── */
-  #winner-bar {
-    display:none; justify-content:center; align-items:center; gap:14px;
-    padding:9px 16px; flex-shrink:0;
-    background:linear-gradient(90deg,var(--purple),var(--pink),var(--yellow),var(--pink),var(--purple));
-    background-size:300% 100%;
-    animation:gs 2s linear infinite;
-  }
-  #winner-bar.show { display:flex; }
-  @keyframes gs { 0%{background-position:0 0} 100%{background-position:300% 0} }
-  .wname { font-family:'Orbitron',sans-serif; font-weight:900; color:#000; font-size:16px; }
-  .wsub { font-size:11px; color:rgba(0,0,0,0.6); font-weight:600; }
-
-  /* ── SCOREBOARD ── */
-  #scoreboard {
-    display:flex; justify-content:center; gap:5px;
-    padding:5px 10px; background:#07071a;
-    border-bottom:1px solid #1a1a30; flex-wrap:wrap; flex-shrink:0;
-  }
-  .si {
-    display:flex; align-items:center; gap:5px;
-    background:rgba(255,255,255,0.04);
-    border:1px solid rgba(255,255,255,0.07);
-    padding:3px 11px; border-radius:20px;
-    font-size:12px; font-weight:600;
-    font-family:'Orbitron',sans-serif;
-    transition:all 0.3s;
-  }
-  .si.lead {
-    background:rgba(255,215,0,0.1);
-    border-color:rgba(255,215,0,0.3);
-    color:var(--yellow);
-  }
-
-  /* ── TRACK ── */
-  .track-container { flex:1; position:relative; overflow:hidden; }
-  .star-bg {
-    position:absolute; inset:0;
-    background-image:
-      radial-gradient(1px 1px at 10% 20%,rgba(255,255,255,0.5),transparent),
-      radial-gradient(2px 2px at 40% 55%,white,transparent),
-      radial-gradient(1px 1px at 65% 30%,rgba(255,255,255,0.6),transparent),
-      radial-gradient(1px 1px at 80% 75%,rgba(255,255,255,0.4),transparent),
-      radial-gradient(2px 2px at 25% 85%,rgba(255,255,255,0.3),transparent);
-    animation:sm 10s linear infinite;
-  }
-  @keyframes sm { from{transform:translateX(0)} to{transform:translateX(-200px)} }
-
-  .splines { position:absolute; inset:0; pointer-events:none; z-index:1; overflow:hidden; }
-  .sl {
-    position:absolute; height:1px;
-    background:linear-gradient(90deg,transparent,rgba(0,212,255,0.15),transparent);
-    animation:slm linear infinite;
-  }
-  @keyframes slm { from{transform:translateX(110vw)} to{transform:translateX(-300px)} }
-
-  .track {
-    position:relative; height:100%;
-    padding:8px 12px;
-    display:flex; flex-direction:column; justify-content:space-evenly;
-    z-index:2;
-  }
-  .lane { display:flex; align-items:center; height:50px; }
-  .lleft {
-    display:flex; align-items:center; gap:5px;
-    width:105px; flex-shrink:0;
-  }
-  .lflag { font-size:20px; line-height:1; }
-  .lname {
-    font-size:10px; font-family:'Orbitron',sans-serif; font-weight:700;
-    color:#3a3a5a; letter-spacing:0.5px;
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:72px;
-  }
-  .ltrack {
-    flex:1; height:2px; position:relative; margin:0 6px;
-    background:repeating-linear-gradient(90deg,#161628 0px,#161628 16px,#202038 16px,#202038 18px);
-  }
-  .fline {
-    position:absolute; right:34px; top:-20px; bottom:-20px; width:4px;
-    background:repeating-linear-gradient(180deg,#fff 0px,#fff 5px,#000 5px,#000 10px);
-    opacity:0.6;
-  }
-  .rocket {
-    position:absolute; left:0; top:50%; transform:translateY(-50%);
-    font-size:24px; z-index:5;
-    transition:left 0.28s cubic-bezier(0.25,0.46,0.45,0.94);
-    animation:rf 2s ease-in-out infinite;
-    filter:drop-shadow(0 0 5px currentColor);
-  }
-  @keyframes rf { 0%,100%{transform:translateY(-50%) rotate(0deg)} 50%{transform:translateY(-56%) rotate(2deg)} }
-  .rocket.burst { animation:rb 0.35s ease-out !important; }
-  @keyframes rb { 0%{transform:translateY(-50%) scale(1)} 40%{transform:translateY(-60%) scale(1.3) translateX(8px)} 100%{transform:translateY(-50%) scale(1)} }
-  .trail {
-    position:absolute; left:-26px; top:50%; transform:translateY(-50%);
-    width:26px; height:3px; border-radius:2px; opacity:0.5;
-    background:linear-gradient(90deg,currentColor,transparent);
-    animation:tf 0.25s ease-in-out infinite alternate;
-  }
-  @keyframes tf { from{opacity:0.3;width:15px} to{opacity:0.7;width:30px} }
-  .rbadge {
-    position:absolute; right:4px; top:50%; transform:translateY(-50%);
-    width:20px; height:20px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    font-size:10px; font-weight:900; font-family:'Orbitron',sans-serif;
-    color:#000; opacity:0; transition:opacity 0.3s;
-  }
-  .rbadge.show { opacity:1; }
-
-  /* ── GIFT NOTIFY ── */
-  #gnotify {
-    position:fixed; top:80px; right:14px;
-    background:rgba(10,10,28,0.92);
-    border:1px solid var(--pink); border-radius:10px;
-    padding:9px 14px; font-family:'Orbitron',sans-serif;
-    z-index:500; pointer-events:none;
-    transform:translateX(220px); opacity:0;
-    transition:all 0.28s cubic-bezier(0.25,0.46,0.45,0.94);
-    max-width:200px;
-  }
-  #gnotify.show { transform:translateX(0); opacity:1; }
-  .gnu { color:var(--yellow); font-size:10px; margin-bottom:2px; }
-  .gng { color:var(--pink); font-size:13px; }
-
-  /* ── CONFETTI ── */
-  .cf {
-    position:absolute; width:8px; height:8px; top:-10px;
-    animation:cff linear forwards; pointer-events:none; z-index:999;
-  }
-  @keyframes cff { to{transform:translateY(100vh) rotate(720deg);opacity:0} }
-
-  /* ── DEMO BTNS ── */
-  #demo-panel {
-    position:absolute; bottom:10px; left:12px;
-    display:flex; flex-direction:column; gap:4px; z-index:100;
-  }
-  .dlabel { font-size:9px; color:#2a2a40; font-family:'Orbitron',sans-serif; letter-spacing:1px; }
-  .dbtns { display:flex; gap:4px; flex-wrap:wrap; }
-  .dbtn {
-    background:rgba(255,255,255,0.03); border:1px solid #181830;
-    color:#3a3a5a; border-radius:6px; padding:3px 7px;
-    font-size:10px; cursor:pointer; transition:all 0.15s;
-    font-family:'Orbitron',sans-serif;
-  }
-  .dbtn:hover { border-color:var(--pink); color:var(--pink); }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rocket Racing - Live</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- STATUS BAR -->
-<div id="status-bar">
-  <div class="dot" id="dot"></div>
-  <span id="stxt">Menghubungkan...</span>
-  <span id="lgift"></span>
-</div>
-
-<!-- WINNER BAR -->
-<div id="winner-bar">
-  <span style="font-size:22px">&#127942;</span>
-  <div><div class="wname" id="wname">-</div><div class="wsub" id="wsub">-</div></div>
-  <span style="font-size:22px">&#127942;</span>
-</div>
-
-<!-- SCOREBOARD -->
-<div id="scoreboard"></div>
-
-<!-- TRACK -->
-<div class="track-container">
-  <div class="star-bg"></div>
-  <div class="splines" id="splines"></div>
-  <div class="track" id="track"></div>
-  <div id="demo-panel">
-    <div class="dlabel">TEST MANUAL</div>
-    <div class="dbtns" id="dbtns"></div>
+  <!-- STATUS BAR -->
+  <div id="status-bar">
+    <div class="dot" id="dot"></div>
+    <span id="stxt">Menghubungkan...</span>
+    <span id="lgift"></span>
   </div>
-</div>
 
-<!-- GIFT NOTIFY -->
-<div id="gnotify"><div class="gnu" id="gnu">-</div><div class="gng" id="gng">-</div></div>
+  <!-- WINNER BAR -->
+  <div id="winner-bar">
+    <span style="font-size:22px">&#127942;</span>
+    <div>
+      <div class="wname" id="wname">-</div>
+      <div class="wsub" id="wsub">-</div>
+    </div>
+    <span style="font-size:22px">&#127942;</span>
+  </div>
 
-<script>
-// ══════════════════════════════════════════════════
-//   ✏️  EDIT KONFIGURASI DI SINI
-// ══════════════════════════════════════════════════
-var CONFIG = {
-  topic:     'rocket-fikridikaa2025',   // ← ganti dengan NTFY topic kamu
-  finish:    20,             // ← target poin menang
-  countries: [
-    'Indonesia',
-    'Vietnam',
-    'Thailand',
-    'Singapore',
-    'Malaysia'
-  ]
-};
-// ══════════════════════════════════════════════════
+  <!-- SCOREBOARD -->
+  <div id="scoreboard"></div>
 
-var FLAGS = {
-  indonesia:'INA', vietnam:'VIE', thailand:'THA',
-  singapore:'SGP', malaysia:'MAL', philippines:'PHA',
-  myanmar:'🇲🇲', cambodia:'🇰🇭', laos:'🇱🇦', brunei:'BRN'
-};
-var COLORS = ['#ff2d78','#ff8c00','#00d4ff','#7b2fff','#00ff88'];
+  <!-- TRACK -->
+  <div class="track-container">
+    <div class="star-bg"></div>
+    <div class="splines" id="splines"></div>
+    <div class="track" id="track"></div>
+    <div id="demo-panel">
+      <div class="dlabel">TEST MANUAL</div>
+      <div class="dbtns" id="dbtns"></div>
+    </div>
+  </div>
 
-var cfg = { topic: CONFIG.topic, finish: CONFIG.finish, countries: [] };
-var pos = [], finished = false, es = null, ntimer = null;
+  <!-- GIFT NOTIFY -->
+  <div id="gnotify">
+    <div class="gnu" id="gnu">-</div>
+    <div class="gng" id="gng">-</div>
+  </div>
 
-// Build countries array from config
-CONFIG.countries.forEach(function(name, i) {
-  var k = name.toLowerCase();
-  cfg.countries.push({
-    name: name,
-    flag: FLAGS[k] || '🏳️',
-    color: COLORS[i % COLORS.length],
-    score: 0,
-    wins: 0
-  });
-});
-pos = new Array(cfg.countries.length).fill(0);
-
-// Auto-start on load
-window.addEventListener('load', function() {
-  renderAll();
-  connectNtfy();
-});
-
-function connectNtfy() {
-  if (es) es.close();
-  setStatus('', 'Menghubungkan ke ntfy.sh...');
-  es = new EventSource('https://ntfy.sh/' + cfg.topic + '/sse');
-  es.onopen = function() { setStatus('on', 'Terhubung — ' + cfg.topic); };
-  es.onmessage = function(e) {
-    try {
-      var d = JSON.parse(e.data);
-      if (d.event === 'keepalive') return;
-      var msg = ((d.message || d.title || '')).toLowerCase().trim();
-      for (var i = 0; i < cfg.countries.length; i++) {
-        var cn = cfg.countries[i].name.toLowerCase();
-        if (msg.indexOf(cn) !== -1 || cn.indexOf(msg) !== -1) {
-          document.getElementById('lgift').textContent = '⚡ ' + (d.title || 'Viewer') + ' → ' + cfg.countries[i].name;
-          showNotify(d.title || 'Viewer', cfg.countries[i].name, cfg.countries[i].flag);
-          moveRocket(i);
-          return;
-        }
-      }
-    } catch(x) {}
-  };
-  es.onerror = function() {
-    setStatus('err', 'Koneksi terputus, mencoba ulang...');
-    setTimeout(function() { if (es) connectNtfy(); }, 4000);
-  };
-}
-
-function renderAll() {
-  renderScore(); renderTrack(); renderDemo(); makeSL();
-}
-
-function renderScore() {
-  var sb = document.getElementById('scoreboard');
-  var s = cfg.countries.slice().sort(function(a,b){return b.score-a.score;});
-  var mx = s[0] ? s[0].score : 0;
-  sb.innerHTML = s.map(function(c) {
-    var lead = c.score > 0 && c.score === mx ? ' lead' : '';
-    return '<div class="si' + lead + '">' + c.flag + ' <span>' + c.score + '</span>' +
-      (c.wins > 0 ? '<span style="color:var(--yellow);font-size:9px">🏆' + c.wins + '</span>' : '') + '</div>';
-  }).join('');
-}
-
-function renderTrack() {
-  var t = document.getElementById('track');
-  t.innerHTML = cfg.countries.map(function(c,i) {
-    return '<div class="lane">' +
-      '<div class="lleft"><span class="lflag">' + c.flag + '</span><span class="lname">' + c.name.toUpperCase() + '</span></div>' +
-      '<div class="ltrack">' +
-        '<div class="fline"></div>' +
-        '<div class="rocket" id="r'+i+'" style="color:'+c.color+'">🚀<div class="trail" style="color:'+c.color+'"></div></div>' +
-        '<div class="rbadge" id="b'+i+'"></div>' +
-      '</div>' +
-    '</div>';
-  }).join('');
-}
-
-function renderDemo() {
-  var el = document.getElementById('dbtns');
-  el.innerHTML = cfg.countries.map(function(c,i) {
-    return '<button class="dbtn" onclick="moveRocket('+i+')">'+c.flag+'</button>';
-  }).join('');
-}
-
-function makeSL() {
-  var c = document.getElementById('splines'); c.innerHTML = '';
-  for (var i=0;i<12;i++) {
-    var l=document.createElement('div'); l.className='sl';
-    l.style.top=Math.random()*100+'%';
-    l.style.width=(40+Math.random()*120)+'px';
-    l.style.animationDuration=(0.6+Math.random()*1.8)+'s';
-    l.style.animationDelay='-'+(Math.random()*2)+'s';
-    c.appendChild(l);
-  }
-}
-
-function moveRocket(i) {
-  if (finished) return;
-  pos[i] = Math.min(pos[i]+1, cfg.finish);
-  var pct = (pos[i]/cfg.finish)*84;
-  var r = document.getElementById('r'+i);
-  if (!r) return;
-  r.style.left = pct+'%';
-  r.classList.add('burst');
-  setTimeout(function(){ r.classList.remove('burst'); }, 350);
-  cfg.countries[i].score = pos[i];
-  renderScore(); updateRanks();
-  if (pos[i] >= cfg.finish) finishRace(i);
-}
-
-function updateRanks() {
-  var s = pos.map(function(p,i){return{p:p,i:i};}).sort(function(a,b){return b.p-a.p;});
-  s.forEach(function(item,rank) {
-    var b = document.getElementById('b'+item.i);
-    if (!b) return;
-    if (rank<3&&item.p>0) {
-      b.textContent = rank+1;
-      b.style.background = rank===0?'gold':rank===1?'#c0c0c0':'#cd7f32';
-      b.classList.add('show');
-    } else { b.classList.remove('show'); }
-  });
-}
-
-function finishRace(idx) {
-  finished = true;
-  var w = cfg.countries[idx]; w.wins++;
-  document.getElementById('wname').innerHTML = w.flag+' '+w.name.toUpperCase()+' MENANG!';
-  document.getElementById('wsub').textContent = 'Total '+w.wins+' kemenangan';
-  document.getElementById('winner-bar').classList.add('show');
-  renderScore();
-  for (var i=0;i<60;i++) { (function(d){setTimeout(mkConfetti,d);})(i*45); }
-  setTimeout(resetRace, 4500);
-}
-
-function mkConfetti() {
-  var el=document.createElement('div'); el.className='cf';
-  el.style.left=Math.random()*100+'vw';
-  el.style.background=['#ff2d78','#00d4ff','#ffd700','#00ff88','#7b2fff','#ff8c00'][Math.floor(Math.random()*6)];
-  el.style.animationDuration=(2+Math.random()*2)+'s';
-  el.style.borderRadius=Math.random()>0.5?'50%':'2px';
-  document.body.appendChild(el);
-  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},4500);
-}
-
-function resetRace() {
-  finished=false; pos=new Array(cfg.countries.length).fill(0);
-  cfg.countries.forEach(function(c){c.score=0;});
-  document.getElementById('winner-bar').classList.remove('show');
-  cfg.countries.forEach(function(c,i){
-    var r=document.getElementById('r'+i); if(r)r.style.left='0%';
-    var b=document.getElementById('b'+i); if(b)b.classList.remove('show');
-  });
-  renderScore();
-}
-
-function setStatus(state, msg) {
-  var d=document.getElementById('dot'),t=document.getElementById('stxt');
-  d.className='dot'+(state==='on'?' on':state==='err'?' err':'');
-  t.textContent=msg;
-  t.style.color=state==='on'?'#00ff88':state==='err'?'#ff4444':'#555';
-}
-
-function showNotify(user,country,flag) {
-  var el=document.getElementById('gnotify');
-  document.getElementById('gnu').textContent='Dari: '+user;
-  document.getElementById('gng').innerHTML=flag+' +1 untuk '+country;
-  el.classList.add('show');
-  clearTimeout(ntimer);
-  ntimer=setTimeout(function(){el.classList.remove('show');},2500);
-}
-</script>
+  <script src="script.js"></script>
 </body>
 </html>
