@@ -19,7 +19,6 @@
     flex-direction: column;
   }
 
-  /* Winner Bar helo*/
   .winner-bar {
     display: none;
     justify-content: center;
@@ -48,15 +47,7 @@
     gap: 10px;
   }
   .winner-bar .winner-flag {
-    width: 40px; height: 28px;
-    object-fit: cover;
-    border-radius: 3px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    animation: flagWave 2s ease-in-out infinite;
-  }
-  @keyframes flagWave {
-    0%, 100% { transform: rotate(-2deg) scale(1); }
-    50% { transform: rotate(2deg) scale(1.05); }
+    font-size: 28px;
   }
   .winner-bar .winner-name {
     font-size: 18px;
@@ -72,13 +63,13 @@
     border-radius: 10px;
   }
 
-  /* Scoreboard */
   .scoreboard {
     display: flex;
     justify-content: center;
     gap: 6px;
     padding: 8px 4px;
     background: linear-gradient(90deg, #ff3366, #ff6b35, #ff3366);
+    flex-wrap: wrap;
   }
   .score-item {
     display: flex; align-items: center; gap: 4px;
@@ -87,14 +78,11 @@
     border-radius: 16px;
     font-size: 12px; font-weight: 600;
   }
-  .flag-img {
-    width: 24px; height: 18px;
-    object-fit: cover;
-    border-radius: 2px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  .flag-emoji {
+    font-size: 18px;
+    line-height: 1;
   }
 
-  /* Racing Track */
   .track-container {
     flex: 1;
     position: relative;
@@ -105,7 +93,7 @@
   .moving-bg {
     position: absolute;
     inset: 0;
-    background: 
+    background:
       radial-gradient(2px 2px at 20px 30px, white, transparent),
       radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
       radial-gradient(1px 1px at 90px 40px, white, transparent),
@@ -162,13 +150,10 @@
   }
 
   .left-flag {
-    width: 32px;
-    height: 22px;
-    object-fit: cover;
-    border-radius: 3px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    font-size: 22px;
     margin-right: 6px;
     flex-shrink: 0;
+    line-height: 1;
   }
 
   .lane-number {
@@ -263,14 +248,12 @@
     text-transform: uppercase;
     letter-spacing: 3px;
     pointer-events: none;
+    white-space: nowrap;
   }
 
   .lane-flag {
-    width: 28px;
-    height: 20px;
-    object-fit: cover;
-    border-radius: 3px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    font-size: 22px;
+    line-height: 1;
   }
 
   .speed-lines {
@@ -322,23 +305,14 @@
   .gift-btn-action:hover { transform: scale(1.15); }
   .gift-btn-action:active { transform: scale(0.95); }
 
-  .gift-btn-action .cost {
-    position: absolute;
-    bottom: -12px;
-    font-size: 8px;
-    background: #333;
-    padding: 1px 5px;
-    border-radius: 6px;
-    white-space: nowrap;
-  }
-
   .confetti {
-    position: fixed;
+    position: absolute;
     width: 10px;
     height: 10px;
     top: -10px;
     animation: confettiFall 3s linear forwards;
     z-index: 999;
+    pointer-events: none;
   }
 
   @keyframes confettiFall {
@@ -370,7 +344,7 @@
 <body>
 
 <div class="winner-bar" id="winnerBar">
-  <div class="trophy">🏆</div>
+  <div class="trophy">&#127942;</div>
   <div class="winner-info" id="winnerInfo"></div>
 </div>
 
@@ -384,35 +358,27 @@
   <div class="track" id="track"></div>
 
   <div class="gift-panel">
-    <button class="gift-btn-action" style="border-color:#ff3366;color:#ff3366" onclick="sendGift(0)">❤️</button>
-    <button class="gift-btn-action" style="border-color:#ff9500;color:#ff9500" onclick="sendGift(1)">🌹</button>
-    <button class="gift-btn-action" style="border-color:#00d4ff;color:#00d4ff" onclick="sendGift(2)">🎁</button>
-    <button class="gift-btn-action" style="border-color:#ff00ff;color:#ff00ff" onclick="sendGift(3)">👑</button>
-    <button class="gift-btn-action" style="border-color:#00ff88;color:#00ff88" onclick="sendGift(4)">💎</button>
+    <button class="gift-btn-action" style="border-color:#ff3366;color:#ff3366" onclick="sendGift(0)">&#10084;&#65039;</button>
+    <button class="gift-btn-action" style="border-color:#ff9500;color:#ff9500" onclick="sendGift(1)">&#127801;</button>
+    <button class="gift-btn-action" style="border-color:#00d4ff;color:#00d4ff" onclick="sendGift(2)">&#127873;</button>
+    <button class="gift-btn-action" style="border-color:#ff00ff;color:#ff00ff" onclick="sendGift(3)">&#128081;</button>
+    <button class="gift-btn-action" style="border-color:#00ff88;color:#00ff88" onclick="sendGift(4)">&#128142;</button>
   </div>
 </div>
 
 <script>
-const flagImages = {
-  'Indonesia': 'https://image.similarpng.com/327ea33b634d70838083cb60b3943709f1886fa8.png',
-  'Vietnam': 'https://image.similarpng.com/9f1cc31309987e7057c8e6fb2352e2a44a5ff8c0.png',
-  'Thailand': 'https://image.similarpng.com/f52fe9be884b998d1bae1ef0d6025dc621c8d9d1.png',
-  'Singapore': 'https://image.similarpng.com/cafcdd68857f2ebf5bef888b0ff94163eaa7319f.png',
-  'Malaysia': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Flag_of_Malaysia.svg/2560px-Flag_of_Malaysia.svg.png'
-};
-
-const countries = [
-  { name: 'Indonesia', flagImg: flagImages['Indonesia'], color: '#ff3333', emoji: '🚀', score: 0, wins: 0 },
-  { name: 'Vietnam', flagImg: flagImages['Vietnam'], color: '#ff0000', emoji: '🚀', score: 0, wins: 0 },
-  { name: 'Thailand', flagImg: flagImages['Thailand'], color: '#0066cc', emoji: '🚀', score: 0, wins: 0 },
-  { name: 'Singapore', flagImg: flagImages['Singapore'], color: '#ff0000', emoji: '🚀', score: 0, wins: 0 },
-  { name: 'Malaysia', flagImg: flagImages['Malaysia'], color: '#ffcc00', emoji: '🚀', score: 0, wins: 0 }
+var countries = [
+  { name: 'Indonesia', flag: '\uD83C\uDDEE\uD83C\uDDE9', color: '#ff3333', emoji: '\uD83D\uDE80', score: 0, wins: 0 },
+  { name: 'Vietnam',   flag: '\uD83C\uDDFB\uD83C\uDDF3', color: '#ff6600', emoji: '\uD83D\uDE80', score: 0, wins: 0 },
+  { name: 'Thailand',  flag: '\uD83C\uDDF9\uD83C\uDDED', color: '#0066cc', emoji: '\uD83D\uDE80', score: 0, wins: 0 },
+  { name: 'Singapore', flag: '\uD83C\uDDF8\uD83C\uDDEC', color: '#cc0033', emoji: '\uD83D\uDE80', score: 0, wins: 0 },
+  { name: 'Malaysia',  flag: '\uD83C\uDDF2\uD83C\uDDFE', color: '#ffcc00', emoji: '\uD83D\uDE80', score: 0, wins: 0 }
 ];
 
-let raceFinished = false;
-let horsePositions = new Array(countries.length).fill(0);
-const FINISH_LINE = 20; // 20 points to win
-const POINTS_PER_GIFT = 1; // All gifts = 1 point
+var raceFinished = false;
+var horsePositions = new Array(countries.length).fill(0);
+var FINISH_LINE = 20;
+var POINTS_PER_GIFT = 1;
 
 function init() {
   renderScoreboard();
@@ -421,9 +387,9 @@ function init() {
 }
 
 function createSpeedLines() {
-  const container = document.getElementById('speedLines');
-  for (let i = 0; i < 15; i++) {
-    const line = document.createElement('div');
+  var container = document.getElementById('speedLines');
+  for (var i = 0; i < 15; i++) {
+    var line = document.createElement('div');
     line.className = 'speed-line';
     line.style.top = Math.random() * 100 + '%';
     line.style.width = (50 + Math.random() * 150) + 'px';
@@ -435,49 +401,48 @@ function createSpeedLines() {
 }
 
 function renderScoreboard() {
-  const sb = document.getElementById('scoreboard');
-  const sorted = [...countries].sort((a,b) => b.score - a.score);
-  sb.innerHTML = sorted.map((c, i) => `
-    <div class="score-item">
-      <img class="flag-img" src="${c.flagImg}" alt="${c.name}" onerror="this.style.display='none'">
-      <span>${c.score}</span>
-      ${c.wins > 0 ? `<span style="color:#ffd700;font-size:10px">🏆${c.wins}</span>` : ''}
-    </div>
-  `).join('');
+  var sb = document.getElementById('scoreboard');
+  var sorted = countries.slice().sort(function(a, b) { return b.score - a.score; });
+  sb.innerHTML = sorted.map(function(c) {
+    return '<div class="score-item">' +
+      '<span class="flag-emoji">' + c.flag + '</span>' +
+      '<span>' + c.score + '</span>' +
+      (c.wins > 0 ? '<span style="color:#ffd700;font-size:10px">\uD83C\uDFC6' + c.wins + '</span>' : '') +
+      '</div>';
+  }).join('');
 }
 
 function renderTrack() {
-  const track = document.getElementById('track');
-  track.innerHTML = countries.map((c, i) => `
-    <div class="lane">
-      <img class="left-flag" src="${c.flagImg}" alt="${c.name}" onerror="this.style.display='none'">
-      <div class="lane-number">${i+1}</div>
-      <div class="lane-track">
-        <span class="country-label">${c.name}</span>
-        <div class="finish-line"></div>
-        <div class="rocket" id="rocket-${i}" style="color:${c.color}">
-          ${c.emoji}
-          <div class="rocket-trail" style="color:${c.color}"></div>
-        </div>
-        <div class="rank-badge" id="rank-${i}"></div>
-      </div>
-      <img class="lane-flag" src="${c.flagImg}" alt="${c.name}" onerror="this.style.display='none'">
-    </div>
-  `).join('');
+  var track = document.getElementById('track');
+  track.innerHTML = countries.map(function(c, i) {
+    return '<div class="lane">' +
+      '<span class="left-flag">' + c.flag + '</span>' +
+      '<div class="lane-number">' + (i+1) + '</div>' +
+      '<div class="lane-track">' +
+        '<span class="country-label">' + c.name + '</span>' +
+        '<div class="finish-line"></div>' +
+        '<div class="rocket" id="rocket-' + i + '" style="color:' + c.color + '">' +
+          c.emoji +
+          '<div class="rocket-trail" style="color:' + c.color + '"></div>' +
+        '</div>' +
+        '<div class="rank-badge" id="rank-' + i + '"></div>' +
+      '</div>' +
+      '<span class="lane-flag">' + c.flag + '</span>' +
+    '</div>';
+  }).join('');
 }
 
 function moveRocket(index) {
   if (raceFinished) return;
 
   horsePositions[index] = Math.min(horsePositions[index] + POINTS_PER_GIFT, FINISH_LINE);
-  const rocket = document.getElementById(`rocket-${index}`);
-  // Calculate percentage: position / finish_line * max_visible_percent
-  const maxVisiblePercent = 85;
-  const leftPercent = (horsePositions[index] / FINISH_LINE) * maxVisiblePercent;
+  var rocket = document.getElementById('rocket-' + index);
+  var maxVisiblePercent = 85;
+  var leftPercent = (horsePositions[index] / FINISH_LINE) * maxVisiblePercent;
   rocket.style.left = leftPercent + '%';
 
   rocket.classList.add('burst');
-  setTimeout(() => rocket.classList.remove('burst'), 400);
+  setTimeout(function() { rocket.classList.remove('burst'); }, 400);
 
   countries[index].score = horsePositions[index];
   renderScoreboard();
@@ -489,11 +454,11 @@ function moveRocket(index) {
 }
 
 function updateRanks() {
-  const sorted = horsePositions.map((pos, i) => ({ pos, i }))
-    .sort((a, b) => b.pos - a.pos);
+  var sorted = horsePositions.map(function(pos, i) { return { pos: pos, i: i }; })
+    .sort(function(a, b) { return b.pos - a.pos; });
 
-  sorted.forEach((item, rank) => {
-    const badge = document.getElementById(`rank-${item.i}`);
+  sorted.forEach(function(item, rank) {
+    var badge = document.getElementById('rank-' + item.i);
     if (rank < 3) {
       badge.textContent = rank + 1;
       badge.style.background = rank === 0 ? 'gold' : rank === 1 ? '#c0c0c0' : '#cd7f32';
@@ -508,48 +473,50 @@ function sendGift(countryIndex) {
 
 function finishRace(winnerIndex) {
   raceFinished = true;
-  const winner = countries[winnerIndex];
+  var winner = countries[winnerIndex];
   winner.wins += 1;
 
-  const winnerBar = document.getElementById('winnerBar');
-  const winnerInfo = document.getElementById('winnerInfo');
-  winnerInfo.innerHTML = `
-    <img class="winner-flag" src="${winner.flagImg}" alt="${winner.name}">
-    <span class="winner-name">${winner.name} MENANG!</span>
-    <span class="winner-score">🏆 ${winner.wins} kemenangan</span>
-  `;
+  var winnerBar = document.getElementById('winnerBar');
+  var winnerInfo = document.getElementById('winnerInfo');
+  winnerInfo.innerHTML =
+    '<span class="winner-flag">' + winner.flag + '</span>' +
+    '<span class="winner-name">' + winner.name + ' MENANG!</span>' +
+    '<span class="winner-score">\uD83C\uDFC6 ' + winner.wins + ' kemenangan</span>';
   winnerBar.classList.add('show');
 
   renderScoreboard();
 
-  for (let i = 0; i < 50; i++) {
-    setTimeout(() => createConfetti(), i * 50);
+  for (var i = 0; i < 50; i++) {
+    (function(delay) {
+      setTimeout(function() { createConfetti(); }, delay);
+    })(i * 50);
   }
 
-  setTimeout(() => resetToStart(), 3000);
+  setTimeout(function() { resetToStart(); }, 3000);
 }
 
 function createConfetti() {
-  const confetti = document.createElement('div');
+  var confetti = document.createElement('div');
   confetti.className = 'confetti';
   confetti.style.left = Math.random() * 100 + 'vw';
-  confetti.style.background = ['#ff3366', '#00d4ff', '#ff9500', '#00ff88', '#ff00ff', '#ffff00'][Math.floor(Math.random() * 6)];
+  confetti.style.background = ['#ff3366','#00d4ff','#ff9500','#00ff88','#ff00ff','#ffff00'][Math.floor(Math.random() * 6)];
   confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
   document.body.appendChild(confetti);
-  setTimeout(() => confetti.remove(), 4000);
+  setTimeout(function() { if (confetti.parentNode) confetti.parentNode.removeChild(confetti); }, 4000);
 }
 
 function resetToStart() {
   raceFinished = false;
   horsePositions = new Array(countries.length).fill(0);
-  countries.forEach(c => c.score = 0);
+  countries.forEach(function(c) { c.score = 0; });
 
   document.getElementById('winnerBar').classList.remove('show');
 
-  countries.forEach((c, i) => {
-    const rocket = document.getElementById(`rocket-${i}`);
-    rocket.style.left = '0%';
-    document.getElementById(`rank-${i}`).classList.remove('show');
+  countries.forEach(function(c, i) {
+    var rocket = document.getElementById('rocket-' + i);
+    if (rocket) rocket.style.left = '0%';
+    var rank = document.getElementById('rank-' + i);
+    if (rank) rank.classList.remove('show');
   });
 
   renderScoreboard();
