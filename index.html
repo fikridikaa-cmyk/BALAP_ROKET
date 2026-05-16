@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="motion.css">
+  <link rel="stylesheet" href="racing.css">
 </head>
 <body>
 
@@ -24,24 +26,17 @@
       <div class="stream-badge">🔴 LIVE</div>
       <button class="stream-toggle" id="streamer-toggle" onclick="toggleStreamerMode()">
         <span id="toggle-label">STREAMER MODE</span>
-        <!-- SOUND CONTROLS -->
+      </button>
       <button class="stream-toggle" id="mute-btn" onclick="handleMuteToggle()" title="Mute/Unmute SFX">
         🔊 <span id="mute-label">SFX ON</span>
       </button>
       <input
-        type="range"
-        id="vol-slider"
+        type="range" id="vol-slider"
         min="0" max="100" value="55"
         oninput="handleVolChange(this.value)"
-        style="
-          width: 60px;
-          accent-color: var(--blue);
-          cursor: pointer;
-          vertical-align: middle;
-        "
+        style="width:60px;accent-color:var(--blue);cursor:pointer;vertical-align:middle;"
         title="Volume SFX"
-      />
-      </button>
+      >
     </div>
 
     <!-- ── WINNER SCREEN (overlay) ── -->
@@ -116,5 +111,7 @@
 
   <script src="sound.js"></script>
   <script src="script.js"></script>
+  <script src="motion.js"></script>
+  <script src="racing.js"></script>
 </body>
 </html>

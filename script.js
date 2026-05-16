@@ -515,10 +515,11 @@ function renderTrack() {
         'width:' + (30 + Math.random()*80) + 'px;' +
         'animation-duration:' + (0.3 + Math.random()*0.4) + 's;' +
         'animation-delay:-' + (Math.random()*0.5) + 's;' +
+        
       '"></div>';
     }
     // Variasikan kecepatan scroll teks per lane
-    var scrollSpeed = (7 + i * 1.5) + 's';
+    var scrollSpeed = (2.5 + i * 0.2) + 's';
 
     return '<div class="lane" id="lane' + i + '">' +
 
@@ -557,6 +558,7 @@ function renderTrack() {
         '</div>' +
         '<div class="score-pill" id="sp' + i + '">0/' + cfg.finish + '</div>' +
       '</div>' +
+      '<div class="lane-left-mask"></div>' +
     '</div>';
   }).join('');
 }
