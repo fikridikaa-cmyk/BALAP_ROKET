@@ -3,48 +3,118 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rocket Racing - Live</title>
+  <title>🚀 Rocket Race LIVE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- STATUS BAR -->
-  <div id="status-bar">
-    <div class="dot" id="dot"></div>
-    <span id="stxt">Menghubungkan...</span>
-    <span id="lgift"></span>
-  </div>
+  <!-- CANVAS BACKGROUND: parallax stars + nebula -->
+  <canvas id="bg-canvas"></canvas>
 
-  <!-- WINNER BAR -->
-  <div id="winner-bar">
-    <span style="font-size:22px">&#127942;</span>
-    <div>
-      <div class="wname" id="wname">-</div>
-      <div class="wsub" id="wsub">-</div>
+  <!-- SCREEN SHAKE WRAPPER -->
+  <div id="shake-root">
+
+    <!-- ── STATUS BAR ── -->
+    <div id="status-bar">
+      <div class="dot" id="dot"></div>
+      <span id="stxt">Menghubungkan...</span>
+      <span id="lgift"></span>
+      <div class="stream-badge">🔴 LIVE</div>
+      <button class="stream-toggle" id="streamer-toggle" onclick="toggleStreamerMode()">
+        <span id="toggle-label">STREAMER MODE</span>
+        <!-- SOUND CONTROLS -->
+      <button class="stream-toggle" id="mute-btn" onclick="handleMuteToggle()" title="Mute/Unmute SFX">
+        🔊 <span id="mute-label">SFX ON</span>
+      </button>
+      <input
+        type="range"
+        id="vol-slider"
+        min="0" max="100" value="55"
+        oninput="handleVolChange(this.value)"
+        style="
+          width: 60px;
+          accent-color: var(--blue);
+          cursor: pointer;
+          vertical-align: middle;
+        "
+        title="Volume SFX"
+      />
+      </button>
     </div>
-    <span style="font-size:22px">&#127942;</span>
-  </div>
 
-  <!-- SCOREBOARD -->
-  <div id="scoreboard"></div>
+    <!-- ── WINNER SCREEN (overlay) ── -->
+    <div id="winner-screen">
+      <canvas id="winner-canvas"></canvas>
+      <div id="winner-content">
+        <div id="winner-crown">👑</div>
+        <div id="winner-label">WINNER</div>
+        <div id="winner-flag-big"></div>
+        <div id="winner-name-big"></div>
+        <div id="winner-sub"></div>
+      </div>
+    </div>
 
-  <!-- TRACK -->
-  <div class="track-container">
-    <div class="star-bg"></div>
-    <div class="splines" id="splines"></div>
-    <div class="track" id="track"></div>
+    <!-- ── TOP PANEL ── -->
+    <div id="top-panel">
+      <div id="leaderboard-wrap">
+        <div class="panel-title">LEADERBOARD</div>
+        <div id="leaderboard"></div>
+      </div>
+      <div id="top-supporter-wrap">
+        <div class="panel-title">⭐ TOP SUPPORTER</div>
+        <div id="ts-name">—</div>
+        <div id="ts-count">0 gifts</div>
+      </div>
+    </div>
+
+    <!-- ── COMBO DISPLAY ── -->
+    <div id="combo-display"></div>
+
+    <!-- ── RANDOM EVENT BANNER ── -->
+    <div id="event-banner"></div>
+
+    <!-- ── TRACK AREA ── -->
+    <div class="track-container" id="track-container">
+      <div class="track" id="track"></div>
+
+      <!-- Global finish progress -->
+      <div id="global-progress">
+        <div class="gp-label">RACE PROGRESS</div>
+        <div id="gp-bar"><div id="gp-fill"></div></div>
+        <div class="gp-label" id="gp-pct">0%</div>
+      </div>
+    </div>
+
+    <!-- ── GIFT NOTIFICATION ── -->
+    <div id="gnotify">
+      <div class="gn-avatar" id="gn-avatar">🎁</div>
+      <div class="gn-info">
+        <div class="gnu" id="gnu">—</div>
+        <div class="gng" id="gng">—</div>
+      </div>
+      <div class="gn-power" id="gn-power">+1</div>
+    </div>
+
+    <!-- ── OVERTAKE ALERT ── -->
+    <div id="overtake-display"></div>
+
+    <!-- ── DEBUG / DEMO PANEL ── -->
     <div id="demo-panel">
-      <div class="dlabel">TEST MANUAL</div>
+      <div class="dlabel">⚙ TEST MANUAL</div>
       <div class="dbtns" id="dbtns"></div>
+      <div class="dlabel" style="margin-top:5px">GIFT SIZE</div>
+      <div class="dbtns" id="size-btns">
+        <button class="dbtn sz-btn active" id="btn-small" onclick="setDemoSize('small')">SMALL</button>
+        <button class="dbtn sz-btn" id="btn-med"   onclick="setDemoSize('medium')">MEDIUM</button>
+        <button class="dbtn sz-btn" id="btn-big"   onclick="setDemoSize('big')">BIG 🔥</button>
+      </div>
     </div>
-  </div>
 
-  <!-- GIFT NOTIFY -->
-  <div id="gnotify">
-    <div class="gnu" id="gnu">-</div>
-    <div class="gng" id="gng">-</div>
-  </div>
+  </div><!-- end shake-root -->
 
+  <script src="sound.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
